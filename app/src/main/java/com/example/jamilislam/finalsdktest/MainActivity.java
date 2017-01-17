@@ -1,9 +1,12 @@
 package com.example.jamilislam.finalsdktest;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -35,6 +38,8 @@ import static java.util.UUID.randomUUID;
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     UserManager mUserManager;
+    DriversitiSDK mDriversitiSDK;
+    DriversitiEventListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +67,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         Driversiti.setConfiguration(driversitiConfiguration);
-        DriversitiSDK driversitiSDK = Driversiti.getSDK();
-        DriversitiEventListener listener = getDriversitiEventListener();
-        driversitiSDK.addEventListener(listener);
-        mUserManager = driversitiSDK.getUserManager();
+        mDriversitiSDK = Driversiti.getSDK();
+        mListener = getDriversitiEventListener();
+        mUserManager = mDriversitiSDK.getUserManager();
         registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,6 +111,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mDriversitiSDK.addEventListener(mListener);
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDriversitiSDK.removeEventListener(mListener);
+    }
+
     private User getApioUserData(){
         User user = new UserBuilder()
                 .setFirstName("android")
@@ -124,57 +141,43 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCarModeStatusChange(final CarModeEvent event) {
                 Log.i(LOG_TAG, "event: " + event.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + event.getEventType().toString(),Toast.LENGTH_LONG);
             }
 
             @Override
             public void onRapidAccelerationDetected(final RapidAccelerationEvent event) {
                 Log.i(LOG_TAG, "event: " + event.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + event.getEventType().toString(),Toast.LENGTH_LONG);
             }
 
             @Override
             public void onHardBrakingDetected(final HardBrakeEvent event) {
                 Log.i(LOG_TAG, "event: " + event.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + event.getEventType().toString(),Toast.LENGTH_LONG);
             }
 
             @Override
             public void onLaneChangingDetected(final LaneChangeEvent event) {
                 Log.i(LOG_TAG, "event: " + event.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + event.getEventType().toString(),Toast.LENGTH_LONG);
             }
 
             @Override
             public void onCrashDetected(final CrashDetectedEvent event) {
-                // crash event is currently not allowed to show up in UI
-//                Log.i(LOG_TAG, "event: " + event.getEventType().toString());
-//                Runnable runnable = new Runnable() {
-//                    public void run() {
-//                        mActiveTripFragment.showEvent(event);
-//                    }
-//                };
-//                postToUiThreadHelper(runnable);
+
             }
 
             @Override
             public void onGenericDeviceHandlingEvent(final GenericDeviceHandlingEvent event) {
                 Log.i(LOG_TAG, "event: " + event.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + event.getEventType().toString(),Toast.LENGTH_LONG);
 
             }
 
             @Override
             public void onDriverDeviceHandlingEvent(final DriverDeviceHandlingEvent event) {
                 Log.i(LOG_TAG, "event: " + event.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + event.getEventType().toString(),Toast.LENGTH_LONG);
 
             }
 
             @Override
             public void onPassengerDeviceHandlingEvent(final PassengerDeviceHandlingEvent event) {
                 Log.i(LOG_TAG, "event: " + event.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + event.getEventType().toString(),Toast.LENGTH_LONG);
 
             }
 
@@ -186,21 +189,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSpeedExceeded(final SpeedExceededEvent speedExceededEvent) {
                 Log.i(LOG_TAG, "event: " + speedExceededEvent.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + speedExceededEvent.getEventType().toString(),Toast.LENGTH_LONG);
 
             }
 
             @Override
             public void onSafeSpeedRestored(final SpeedRestoredEvent speedRestoredEvent) {
                 Log.i(LOG_TAG, "event: " + speedRestoredEvent.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + speedRestoredEvent.getEventType().toString(),Toast.LENGTH_LONG);
 
             }
 
             @Override
             public void onTripStart(final TripStartEvent event) {
                 Log.i(LOG_TAG, "event: " + event.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + event.getEventType().toString(),Toast.LENGTH_LONG);
 
             }
 
@@ -208,7 +208,6 @@ public class MainActivity extends AppCompatActivity {
             public void onTripEnd(final TripEndEvent event) {
                 super.onTripEnd(event);
                 Log.i(LOG_TAG, "event: " + event.getEventType().toString());
-                Toast.makeText(getApplicationContext(),"event: " + event.getEventType().toString(),Toast.LENGTH_LONG);
 
             }
         };
